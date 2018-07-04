@@ -69,16 +69,6 @@ class VerticalScrollFrame(Frame):
 
         canvas.bind('<Configure>', _configure_canvas)
 
-# Animated GIF Toplevel
-#class AnimatedGIF(Label):
-
-# def delete_files():
-#     for i in range(len(files)):
-#         if os.path.isfile(files[i]):
-#             os.remove(files[i])
-
-#     del files[0:len(files)]
-
 def delete_folders():
     for i in range(len(folderpaths)):
         if os.path.exists(folderpaths[i]):
@@ -119,16 +109,14 @@ def reply(file, emailfrom, subject):
     attachment.grid(row=4, column=1)
 
     msg.insert(INSERT, "\n")
-    # msg.update()
-    # print(msg.winfo_width())
-    # print(msg.cget('width'))
+
     for i in range(111):
         msg.insert(INSERT, "-")
     msg.insert(INSERT, "\n")
 
     textfile = io.open(file, 'r', encoding="utf-8")
     email_message = textfile.read()
-    textfile.close()  # Display email contents in the display region
+    textfile.close()  
     msg.insert(END, email_message)
 
     attach = Button(replyemail, text="Add Attachment", command=lambda: selectAttachment(attachment))
@@ -140,34 +128,6 @@ def reply(file, emailfrom, subject):
     send = Button(replyemail, text="Send", command=lambda: donothing())
     send.grid(row=7, column=1)
 
-
-# def display_email(root, display_region, file):
-#     try:
-#         # Clear the display region of any current content
-#         display_region.config(state=NORMAL)
-#         display_region.delete("1.0", END)
-#     except:
-#         pass
-
-#     try:
-#         replyBttn[-1].destroy()
-#         del replyBttn[0:len(replyBttn)]
-#     except:
-#         pass
-
-#     # Open file containing specified email
-#     textfile = io.open(file, 'r', encoding = "utf-8")
-#     email_message = textfile.read()
-#     textfile.close()
-
-#     # Display email contents in the display region
-#     display_region.insert(END, email_message)
-#     display_region.config(state=DISABLED)
-
-#     # Reply button
-#     replyBttn.append(Button(root, text = "Reply", command = lambda: reply(file)))
-#     replyBttn[-1].pack(anchor = SE)
-
 def updateGIF(window, display, gif, num_frames, ind):
     frame = gif[ind]
     ind += 1
@@ -178,9 +138,7 @@ def updateGIF(window, display, gif, num_frames, ind):
         delay = num_frames * 10 + (num_frames * 3)
     else:
         delay = num_frames - 10
-    # Can this be done?
-    #window.after(delay, update, ind)
-    #window.after(delay, updateGIF(window, display, gif, num_frames, 0), ind)
+
     window.after(delay, updateGIF, window, display, gif, num_frames, ind)
 
 def display_gif(path):
@@ -190,24 +148,19 @@ def display_gif(path):
     im = PIL.Image.open(path)
     width, height = im.size
     gif_img.configure(width = width, height = height)
-    #img = ImageTk.PhotoImage(newIm)
+
     # Iterate through the entire GIF
     try:
         while 1:    
             im.seek(im.tell() + 1)
     except EOFError:
-        pass                        # End of sequence
+        pass
     num_frames = im.tell()
     im.close()
     gif = [PhotoImage(file = path, format = 'gif -index %i' % i) for i in range(num_frames)]
     panel = Label(gif_img)
     panel.pack()
-    #gif_img.after(0, updateGIF(gif_img, panel, gif, num_frames, 0), 0)
     updateGIF(gif_img, panel, gif, num_frames, 0)
-    #gif_img.mainloop()
-
-def save_attch():
-    pass
 
 def popup(event, menu):
     try: 
@@ -250,9 +203,6 @@ def display_email(root, display_region, folderpath, emailfrom, subject):
         contents.close()
         display_region.insert(END, email_msg)
 
-    # Display email message in the display region
-    #display_region.insert(END, email_msg)
-
     # See if there are any other attachments
     attachments = []
     for i in range(len(files)):
@@ -266,52 +216,38 @@ def display_email(root, display_region, folderpath, emailfrom, subject):
             if len(attch) == 1:
                 attch_path = os.path.join(path, attch[0])
                 im = PIL.Image.open(attch_path)
-                width, height = im.size     # Original size of the image
-                display_region.update()     # Update the display region info
+                width, height = im.size     
+                display_region.update()     
                 dwidth = display_region.winfo_width()
                 nheight = int((height * dwidth)/width)    # Calculate new height of the image
                 newIm = im.resize((dwidth, nheight), PIL.Image.ANTIALIAS)   # Resize the image to fit the display region
                 img = ImageTk.PhotoImage(newIm)
-                #im.close()
                 display_region.image_create(END, image = img)
                 display_region.image = img
             gifattch = re.findall(r"[\w\s_-]+.gif", files[i], re.I)
             if len(gifattch) == 1:
                 attch_path = os.path.join(path, str(gifattch[0]))
                 im = PIL.Image.open(attch_path)
-                width, height = im.size     # Original size of the image
-                display_region.update()     # Update the display region info
+                width, height = im.size     
+                display_region.update()     
                 dwidth = display_region.winfo_width()
-                nheight = int((height * dwidth)/width)    # Calculate new height of the image
-                newIm = im.resize((dwidth, nheight), PIL.Image.ANTIALIAS)   # Resize the image to fit the display region
+                nheight = int((height * dwidth)/width)   
+                newIm = im.resize((dwidth, nheight), PIL.Image.ANTIALIAS)   
                 img = ImageTk.PhotoImage(newIm)
                 im.close()
-                # Iterate through the entire GIF
-                # try:
-                #     while 1:    
-                #         im.seek(im.tell() + 1)
-                # except EOFError:
-                #     pass                        # End of sequence
-                # num_frames = im.tell()
-                # gif = [PhotoImage(file = attch_path, format = 'gif -index %i' % i) for i in range(num_frames)]
-                #im.close()
+
+                display_region.insert(END, "< Right-Click Image to View GIF >")
+                line = display_region.index(tk.INSERT)
+                line = line.split(".")[0] + ".0"
+                display_region.tag_add("instruction", line, INSERT)
+                display_region.tag_config("instruction", background = "yellow", foreground = "red")
                 gif_img = Label(display_region, image = img)
                 gif_img.image = img
                 display_region.window_create(END, window = gif_img)
                 # Popup Menu for image
                 popup_menu = Menu(gif_img, tearoff = 0)
                 popup_menu.add_command(label = "View", command = lambda: display_gif(attch_path))
-                popup_menu.add_command(label = "Save as...", command = lambda: save_attch())
                 gif_img.bind("<ButtonRelease-3>", lambda event: popup(event, popup_menu))
-                # display_region.insert(END, "< Double-Click Image to View GIF >")
-                # line = display_region.index(tk.INSERT)
-                # line = line.split(".")[0] + ".0"
-                # #print(line)
-                # display_region.tag_add("instruction", line, INSERT)
-                # display_region.tag_config("instruction", background = "yellow", foreground = "red")
-                #gif_img.after(0, updateGIF(gif_img, gif, num_frames, 0), 0)
-                #gui.after(0, updateGIF(gif_img, gif, num_frames, 0), 0)
-
 
     # Disable the textbox region
     display_region.configure(state = DISABLED)
@@ -325,9 +261,7 @@ def get_emails(root, parent, uname, pword, folder, display_region, label):
     label.config(text = folder)
 
     # Delete files of previous folder (if any)
-    #delete_files()
     delete_folders()
-    #del files[0:len(files)]
     del folderpaths[0:len(folderpaths)]
     for i in range(len(buttonlist)):
         buttonlist[i].destroy()
@@ -380,24 +314,20 @@ def get_emails(root, parent, uname, pword, folder, display_region, label):
                 except:
                     email_cc = ""
 
-            path = os.path.dirname(os.path.abspath(__file__)) # Takes the current path
+            path = os.path.dirname(os.path.abspath(__file__)) 
 
             # Body Details
             for part in msg.walk():
                 if part.get_content_type() == "text/plain":
                     body = part.get_payload(decode=True)
                     newpath = os.path.join(path, "email_" + str(i))
+
                     if not os.path.exists(newpath):                     # Creates a folder for the email
                         os.makedirs(newpath)
-                        print("email_%s" % str(i))
                     folderpaths.append(newpath)                         # Add folder to the list of folders created for the email
                     file_name = "email_" + str(i) + ".txt"
                     filepath = os.path.join(newpath, file_name)
-                    #print(filepath)
-                    # if not os.path.isfile(filepath):                    # Create a text file that contains the text contents of the email
-                    #     print("Opening output_file")
-                    #     output_file = io.open(filepath, 'w', encoding = "utf-8")
-                    #files.append(file_name)
+
                     output_file = io.open(filepath, 'w', encoding = "utf-8")
                     if email_cc == "":
                         output_file.write("From: %s\nTo: %s\nDate: %s\nSubject: %s\n\nBody: \n\n%s" % (
@@ -405,37 +335,32 @@ def get_emails(root, parent, uname, pword, folder, display_region, label):
                     else:
                         output_file.write("From: %s\nTo: %s\nCC: %s\nDate: %s\nSubject: %s\n\nBody: \n\n%s" % (
                            email_from, email_to, email_cc, local_message_date, subject, body.decode('utf-8')))
-                    #print("Closing output_file")
                     output_file.close()
-                    #buttonlist.append(Button(parent, text = email_from + "\n" + subject,
-                    #                        padx = 5, pady = 5, command = lambda i=i: display_email(root, display_region, files[i])))
-                    buttonlist.append(Button(parent, text = email_from + "\n" + subject,
-                                            padx = 5, pady = 5, command = lambda i=i: display_email(root, display_region, folderpaths[i],
-                                                                                                    email_from, subject)))
+
+                    if folder == "Inbox":
+                        buttonlist.append(Button(parent, text = "%s\n%s" % (email_from, subject), 
+                                                    padx = 5, pady = 5, command = lambda i=i: display_email(root, display_region, 
+                                                                                                            folderpaths[i], email_from, subject)))
+                    elif folder == '"[Gmail]/Sent Mail"':
+                        buttonlist.append(Button(parent, text = "To: %s\n%s" % (email_to, subject),
+                                                    padx = 5, pady = 5, command = lambda i=i: display_email(root, display_region,
+                                                                                                            folderpaths[i], email_to, subject)))
                     buttonlist[-1].pack(side=BOTTOM, fill=X)
                 else:
                     continue
-            #print("reaches here")
-            #print(filename)
+
             # Create file for attachment if any
             for part in msg.walk():
                 if part.get_content_maintype() == "multipart":
-                    #print(part.get_content_maintype())
-                    #print(part.get_content_subtype())
-                    #print(part.as_string())
                     continue
                 if part.get('Content-Disposition') is None:
-                    #print("Content-Disposition: " + str(part.get('Content-Disposition')))
                     continue
-                #print("Content-Type: " + str(part.get_content_type()))
-                # if part.get_content_type() == "image/jpeg":
-                #     print("This is a jpg")
                 filename = part.get_filename()
                 if part.get_content_type() == "image/jpeg":
-                    pattern = re.compile(".jpg", re.I)
+                    pattern = re.compile(".jpg", re.I)                    
                     match = pattern.search(filename)
                     if not match:
-                        filename = filname + ".jpg"
+                        filename = filename + ".jpg"
                 elif part.get_content_type() == "image/gif":
                     pattern = re.compile(".gif", re.I)
                     match = pattern.search(filename)
@@ -443,23 +368,16 @@ def get_emails(root, parent, uname, pword, folder, display_region, label):
                         filename = filename + ".gif"
                 else:
                     pass
-                #print(filename)
+
                 att_path = os.path.join(path, "email_" + str(i), filename)
-                #print(att_path)
 
                 if not os.path.isfile(att_path):
                     fp = open(att_path, 'wb')
                     fp.write(part.get_payload(decode = True))
                     fp.close()
-                #print(att_path)
 
     except Exception as e:
         print(str(e))
-
-def donothing():
-    draft = Toplevel(gui)
-    button = Button(draft, text="Do nothing button")
-    button.pack()
 
 def sendingemail(frame, connection, uname, to, subject, cc, bcc, body, attch):
     msg = MIMEMultipart()
@@ -520,7 +438,6 @@ def removeAttachment(entrybox):
     entrybox.delete(0, END)
     entrybox.config(state=DISABLED)
 
-
 def newemail(connection, uname):
     writeemail = Toplevel()
     writeemail.title("New Message")
@@ -554,14 +471,11 @@ def newemail(connection, uname):
                                               CC.get().split(", "), BCC.get().split(", "), msg.get("1.0", END), attachment.get()), width=15)
     send.grid(row=7, column=1)
 
-
 def logoutBtn(connection, window):
-    #delete_files()
     delete_folders()
     connection.quit()
     window.pack_forget()
     login_screen()
-
 
 def create_menubar(parent, connection, uname):
     # Logout button
@@ -571,11 +485,6 @@ def create_menubar(parent, connection, uname):
     # New Message button
     new_button = Button(parent, text="New", command=lambda: newemail(connection, uname))
     new_button.pack(anchor=NW, side=LEFT)
-
-    # Delete button
-    delete_button = Button(parent, text="Delete", command=donothing)
-    delete_button.pack(anchor=NW)
-
 
 def init_layout(connection, uname, pword, folder):
     window = Frame(gui, height=400, width=600)
@@ -589,7 +498,6 @@ def init_layout(connection, uname, pword, folder):
     folders = Listbox(frame, font="12", height=600, width=10)
     folders.insert(END, "Inbox")
     folders.insert(END, "Sent Mail")
-    folders.insert(END, "Trash")
     folders.pack(side=LEFT, fill=Y)
 
     # List of emails
@@ -680,13 +588,9 @@ gui.title("Email Application")
 
 gui.protocol("WM_DELETE_WINDOW", lambda: on_close())
 
-#files = []
 folderpaths = []
 buttonlist = []
 replyBttn = []
 
-random = Frame(gui)
-random.pack()
-login(random, "ece433lstudentb", "studentbpass")
-# login_screen()
+login_screen()
 gui.mainloop()
