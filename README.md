@@ -1,6 +1,5 @@
 # Email-GUI
-Simple Python Email GUI for school project
-Collaboration with a partner
+Simple Python Email GUI for school project with a partner
 
 Functionality of the Program:
 - Login screen upon initializing program
